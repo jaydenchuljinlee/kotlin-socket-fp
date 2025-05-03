@@ -1,4 +1,4 @@
-package com.kotlin.socket.chat.state
+package com.kotlin.socket.chat.handler
 
 import com.kotlin.socket.chat.model.ChatEvent
 import org.springframework.web.socket.WebSocketSession
