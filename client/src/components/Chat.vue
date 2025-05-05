@@ -21,6 +21,15 @@
                 placeholder="사용자 ID를 입력하세요"
               />
             </div>
+            <div class="flex-1">
+                <label class="block text-sm font-medium text-white mb-2">채팅방 ID</label>
+                <input 
+                    v-model="roomId" 
+                    type="text" 
+                    class="w-full h-11 px-4 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50"
+                    placeholder="roomId를 입력하세요"
+                />
+            </div>
             <button 
               v-if="!connected" 
               @click="connect" 
@@ -145,19 +154,19 @@
 </template>
 
 <script setup>
-import { ref, nextTick, onMounted, watch } from 'vue'
+import { ref, nextTick, watch } from 'vue'
 import SockJS from 'sockjs-client'
 import { Client } from '@stomp/stompjs'
 
 const stompClient = ref(null)
 const userId = ref('')
+const roomId = ref('')
 const to = ref('')
 const content = ref('')
 const messages = ref([])
 const connected = ref(false)
 const messageContainer = ref(null)
 
-// 메시지가 추가될 때마다 스크롤을 맨 아래로 이동
 const scrollToBottom = async () => {
   await nextTick()
   if (messageContainer.value) {
@@ -165,29 +174,35 @@ const scrollToBottom = async () => {
   }
 }
 
-watch(messages, () => {
-  scrollToBottom()
-})
+watch(messages, scrollToBottom)
 
 const connect = () => {
-  if (!userId.value) return alert('사용자 ID를 입력해주세요')
+  if (!userId.value || !roomId.value) return alert('사용자 ID와 Room ID를 입력해주세요')
 
   const socket = new SockJS('http://localhost:8080/ws')
   stompClient.value = new Client({
     webSocketFactory: () => socket,
     onConnect: () => {
       connected.value = true
-      stompClient.value.publish({
-        destination: '/app/chat.join',
-        body: JSON.stringify({ userId: userId.value })
+      stompClient.value.subscribe(`/topic/chatroom/${roomId.value}`, (message) => {
+        try {
+          const parsed = JSON.parse(message.body)
+          console.log(parsed);
+          messages.value.push(parsed)
+        } catch {
+          messages.value.push({ content: message.body })
+          console.log(messages.value);
+        }
       })
-      stompClient.value.subscribe('/user/queue/messages', (message) => {
-        messages.value.push(message.body)
+
+      stompClient.value.publish({
+        destination: `/app/chat/join/${roomId.value}`,
+        body: JSON.stringify({ userId: Number(userId.value) })
       })
     },
     onDisconnect: () => {
       connected.value = false
-      messages.value.push('[시스템] 연결이 해제되었습니다.')
+      messages.value.push({ content: '[시스템] 연결이 해제되었습니다.' })
     }
   })
 
@@ -197,8 +212,8 @@ const connect = () => {
 const disconnect = () => {
   if (stompClient.value) {
     stompClient.value.publish({
-      destination: '/app/chat.leave',
-      body: JSON.stringify({ userId: userId.value })
+      destination: `/app/chat/leave/${roomId.value}`,
+      body: JSON.stringify({ userId: Number(userId.value) })
     })
     stompClient.value.deactivate()
     stompClient.value = null
@@ -209,57 +224,22 @@ const disconnect = () => {
 
 const sendMessage = () => {
   if (!to.value || !content.value) return
-  const message = {
-    from: userId.value,
-    to: to.value,
-    content: content.value,
-  }
   stompClient.value.publish({
-    destination: '/app/chat.message',
-    body: JSON.stringify(message)
+    destination: `/app/chat/message/${roomId.value}`,
+    body: JSON.stringify({
+      from: Number(userId.value),
+      to: Number(to.value),
+      content: content.value,
+    })
   })
   content.value = ''
 }
 
-// 메시지 처리 유틸리티 함수들
-const isMyMessage = (msg) => {
-  try {
-    const parsed = typeof msg === 'string' ? JSON.parse(msg) : msg
-    return parsed.from === userId.value
-  } catch (e) {
-    return false
-  }
-}
-
-const getMessageContent = (msg) => {
-  try {
-    const parsed = typeof msg === 'string' ? JSON.parse(msg) : msg
-    return parsed.content || msg
-  } catch (e) {
-    return msg
-  }
-}
-
-const getSender = (msg) => {
-  try {
-    const parsed = typeof msg === 'string' ? JSON.parse(msg) : msg
-    return parsed.from || '알 수 없음'
-  } catch (e) {
-    return '시스템'
-  }
-}
-
-const getInitials = (msg) => {
-  const sender = getSender(msg)
-  return sender.substring(0, 2).toUpperCase()
-}
-
-const getCurrentTime = () => {
-  return new Date().toLocaleTimeString('ko-KR', {
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}
+const isMyMessage = (msg) => msg.from === Number(userId.value)
+const getMessageContent = (msg) => msg.content || msg
+const getSender = (msg) => msg.from || '시스템'
+const getInitials = (msg) => String(getSender(msg)).substring(0, 2).toUpperCase()
+const getCurrentTime = () => new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
 </script>
 
 <style scoped>
