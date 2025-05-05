@@ -1,3 +1,3 @@
 package com.kotlin.socket.chat.dto
 
-class JoinRequest( val userId: Long)
+data class JoinRequest( val userId: Long)
