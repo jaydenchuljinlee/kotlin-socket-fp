@@ -8,7 +8,8 @@
 - 보통 `Left`는 **실패**, `Right`는 **성공**을 의미함.
 
 ```kotlin
-val result: Either<Error, Success> = Either.Right(Success(...))```
+val result: Either<Error, Success> = Either.Right(Success(...))
+```
 
 - `fold(left, right)`를 통해 결과를 분기 처리 가능.
 - 단점: `Left` 또는 `Right` 중 하나만 존재하므로, 여러 에러를 담기 어려움.
@@ -18,7 +19,8 @@ val result: Either<Error, Success> = Either.Right(Success(...))```
 - 주로 유효성 검증에 사용.
 
 ```kotlin
-val result: ValidatedNel<ValidationError, ValidatedUser>```
+val result: ValidatedNel<ValidationError, ValidatedUser>
+```
 
 - `Validated`는 성공(Valid) 또는 실패(Invalid(errors)) 중 하나를 가짐.
 - `Nel`: Non-empty list (1개 이상의 오류를 담을 수 있음)
@@ -32,7 +34,8 @@ chatService.executeCommand(command)
     .fold(
         ifLeft = { MessageResponse("[Error] ${it.toMessage()}") },
         ifRight = { it }
-    )```
+    )
+```
 
 ### 2. 일관된 컨트롤러 처리
 - 모든 요청이 `Either`로 처리되므로 코드의 <b>통일성과 안정성</b> 확보
@@ -49,7 +52,8 @@ chatService.executeCommand(command)
 suspend fun execute(): Either<AppError, Response> {
     return if (success) Either.Right(response)
            else Either.Left(AppError("..."))
-}```
+}
+```
 
 - 코루틴 환경에서도 Either는 완벽하게 작동
 
