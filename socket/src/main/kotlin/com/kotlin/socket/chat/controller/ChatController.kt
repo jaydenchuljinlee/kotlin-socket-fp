@@ -21,23 +21,23 @@ class ChatController(
         return runBlocking {
             chatService.executeCommand(ChatCommand.Join(roomId, request.userId))
                 .fold(
-                    ifLeft = { MessageResponse("[Error] ${it.toMessage()}") },
-                    ifRight = { it }
+                    ifLeft = { error -> MessageResponse("[Error] ${error.toMessage()}") },
+                    ifRight = { response -> response }
                 )
         }
     }
-
 
     @MessageMapping("/chat/message/{roomId}")
     @SendTo("/topic/chatroom/{roomId}")
     fun handleMessage(
         @DestinationVariable roomId: String,
-        @Payload request: MessageRequest): MessageResponse {
+        @Payload request: MessageRequest
+    ): MessageResponse {
         return runBlocking {
             chatService.executeCommand(ChatCommand.SendMessage(roomId, request.from, request.to, request.content))
                 .fold(
-                    ifLeft = { MessageResponse("[Error] ${it.toMessage()}") },
-                    ifRight = { it }
+                    ifLeft = { error -> MessageResponse("[Error] ${error.toMessage()}") },
+                    ifRight = { response -> response }
                 )
         }
     }
@@ -46,12 +46,13 @@ class ChatController(
     @SendTo("/topic/chatroom/{roomId}")
     fun handleLeave(
         @DestinationVariable roomId: String,
-        @Payload request: LeaveRequest): MessageResponse {
+        @Payload request: LeaveRequest
+    ): MessageResponse {
         return runBlocking {
             chatService.executeCommand(ChatCommand.Leave(roomId, request.userId))
                 .fold(
-                    ifLeft = { MessageResponse("[Error] ${it.toMessage()}") },
-                    ifRight = { it }
+                    ifLeft = { error -> MessageResponse("[Error] ${error.toMessage()}") },
+                    ifRight = { response -> response }
                 )
         }
     }
