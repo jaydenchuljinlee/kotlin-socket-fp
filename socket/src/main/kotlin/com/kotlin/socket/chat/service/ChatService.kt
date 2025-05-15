@@ -9,10 +9,12 @@ import com.kotlin.socket.chat.infrastructure.ChatStateStore
 import com.kotlin.socket.chat.model.ChatCommand
 import com.kotlin.socket.chat.model.RoomId
 import kotlinx.coroutines.flow.first
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 
 @Service
 class ChatService(
+    @Qualifier("redisChatStateStore")
     private val stateStore: ChatStateStore,
     private val executor: ChatEffectExecutor
 ) {
