@@ -1,39 +1,69 @@
-# .
+# WebSocket 채팅 클라이언트
 
-This template should help get you started developing with Vue 3 in Vite.
+Vue 3와 TypeScript를 사용하여 구현된 실시간 WebSocket 채팅 클라이언트입니다.
 
-## Recommended IDE Setup
+## 기술 스택
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- Vue 3
+- TypeScript
+- Vite
+- STOMP.js
+- TailwindCSS
 
-## Type Support for `.vue` Imports in TS
+## 주요 기능
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+- 실시간 WebSocket 통신
+- 채팅방 입장/퇴장
+- 1:1 메시지 전송
+- 실시간 메시지 수신
+- 반응형 UI
 
-## Customize configuration
+## 시작하기
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+### 필수 조건
 
-## Project Setup
+- Node.js 18.0.0 이상
+- npm 또는 yarn
 
-```sh
+### 설치
+
+```bash
+# 의존성 설치
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+### 개발 서버 실행
 
-```sh
+```bash
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+### 빌드
 
-```sh
+```bash
 npm run build
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+## 프로젝트 구조
 
-```sh
-npm run lint
 ```
+src/
+  ├── components/     # Vue 컴포넌트
+  ├── assets/        # 정적 자원
+  └── App.vue        # 루트 컴포넌트
+```
+
+## 사용 방법
+
+1. 사용자 ID와 채팅방 ID를 입력합니다.
+2. '연결하기' 버튼을 클릭하여 WebSocket 서버에 연결합니다.
+3. 메시지를 보낼 상대방의 ID와 메시지 내용을 입력합니다.
+4. '전송' 버튼을 클릭하거나 Enter 키를 눌러 메시지를 전송합니다.
+
+## 개발 스크립트
+
+- `npm run dev`: 개발 서버 실행
+- `npm run build`: 프로덕션 빌드
+- `npm run type-check`: TypeScript 타입 체크
+- `npm run lint`: ESLint를 사용한 코드 린팅
+- `npm run format`: Prettier를 사용한 코드 포맷팅
