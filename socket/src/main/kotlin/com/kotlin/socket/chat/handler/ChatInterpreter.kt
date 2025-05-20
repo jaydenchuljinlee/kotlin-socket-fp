@@ -18,6 +18,7 @@ object ChatInterpreter {
                     val newState = state.copy(activeUsers = state.activeUsers + cmd.userId)
                     (newState to listOf(
                         ChatEffect.Broadcast(cmd.roomId, "[System] ${cmd.userId} joined."),
+                        ChatEffect.JoinUser(cmd.roomId, cmd.userId),
                         ChatEffect.Log("Join: ${cmd.userId} in ${cmd.roomId}")
                     )).right()
                 }
@@ -30,6 +31,7 @@ object ChatInterpreter {
                     val newState = state.copy(activeUsers = state.activeUsers - cmd.userId)
                     (newState to listOf(
                         ChatEffect.Broadcast(cmd.roomId, "[System] ${cmd.userId} left."),
+                        ChatEffect.LeaveUser(cmd.roomId, cmd.userId),
                         ChatEffect.Log("Leave: ${cmd.userId} from ${cmd.roomId}")
                     )).right()
                 }
