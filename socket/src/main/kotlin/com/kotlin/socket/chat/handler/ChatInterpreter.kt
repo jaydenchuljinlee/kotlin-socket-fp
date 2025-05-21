@@ -41,10 +41,12 @@ object ChatInterpreter {
                 if (cmd.content.isBlank()) {
                     ChatError.InvalidMessage("Message is blank").left()
                 } else {
+                    val message = "${cmd.from}: ${cmd.content}"
                     (state to listOf(
                         ChatEffect.Broadcast(cmd.roomId, "${cmd.from}: ${cmd.content}"),
                         ChatEffect.PersistMessage(cmd.roomId, cmd.from, cmd.content),
-                        ChatEffect.Log("Message from ${cmd.from} in ${cmd.roomId}")
+                        ChatEffect.Log("Message from ${cmd.from} in ${cmd.roomId}"),
+                        ChatEffect.CacheMessage(cmd.roomId, message)
                     )).right()
                 }
             }
