@@ -1,4 +1,4 @@
-package com.kotlin.socket.chat.infrastructure
+package com.kotlin.socket.chat.infrastructure.inmemory.store
 
 import org.springframework.stereotype.Component
 

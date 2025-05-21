@@ -1,7 +1,7 @@
 package com.kotlin.socket.chat.executor
 
 import com.kotlin.socket.chat.error.ChatError
-import com.kotlin.socket.chat.infrastructure.ChatHistoryStore
+import com.kotlin.socket.chat.infrastructure.inmemory.store.ChatHistoryStore
 import com.kotlin.socket.chat.model.ChatEffect
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe

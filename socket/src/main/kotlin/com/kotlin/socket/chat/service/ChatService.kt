@@ -5,7 +5,7 @@ import com.kotlin.socket.chat.dto.MessageResponse
 import com.kotlin.socket.chat.error.ChatError
 import com.kotlin.socket.chat.executor.ChatEffectExecutor
 import com.kotlin.socket.chat.handler.ChatInterpreter
-import com.kotlin.socket.chat.infrastructure.ChatStateStore
+import com.kotlin.socket.chat.infrastructure.inmemory.store.ChatStateStore
 import com.kotlin.socket.chat.model.ChatCommand
 import com.kotlin.socket.chat.model.RoomId
 import com.kotlin.socket.common.lock.RedissonLockSupporter
