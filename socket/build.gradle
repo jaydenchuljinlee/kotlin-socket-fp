@@ -29,6 +29,8 @@ dependencies {
 	implementation("io.arrow-kt:arrow-fx-coroutines:1.2.0")
 
 	implementation("org.redisson:redisson-spring-boot-starter:3.27.2")
+	implementation("org.springframework.boot:spring-boot-starter-data-cassandra")
+
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.kotest:kotest-runner-junit5:5.8.1'
