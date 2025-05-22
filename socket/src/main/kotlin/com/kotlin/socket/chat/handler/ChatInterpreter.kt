@@ -50,6 +50,16 @@ object ChatInterpreter {
                     )).right()
                 }
             }
+
+            is ChatCommand.Typing -> {
+                Either.Right(
+                    state to listOf(
+                        ChatEffect.Typing(cmd.roomId, cmd.userId),
+                        ChatEffect.Log("User ${cmd.userId} is typing in ${cmd.roomId}")
+                    )
+                )
+            }
+
         }
     }
 }

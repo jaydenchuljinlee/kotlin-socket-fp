@@ -14,6 +14,7 @@ class ChatEffectExecutor(
     private val broadcastExecutor: BroadcastEffectExecutor,
     private val persistMessageExecutor: PersistMessageEffectExecutor,
     private val userStateEffectExecutor: UserStateEffectExecutor,
+    private val typingEffectExecutor: TypingEffectExecutor,
     private val redisTemplate: StringRedisTemplate
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
@@ -41,6 +42,10 @@ class ChatEffectExecutor(
                     is ChatEffect.CacheMessage -> {
                         logger.info("🧠 Caching message: $effect")
                         cacheToRedis(effect)
+                    }
+                    is ChatEffect.Typing -> {
+                        logger.info("🧠 Typing message: $effect")
+                        typingEffectExecutor.execute(effect)
                     }
                     is ChatEffect.Log -> {
                         logger.info("🪵 LOG: ${effect.content}")
