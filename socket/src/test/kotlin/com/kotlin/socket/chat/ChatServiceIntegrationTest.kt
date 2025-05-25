@@ -1,6 +1,6 @@
 package com.kotlin.socket.chat
 
-import com.kotlin.socket.chat.infrastructure.RedisChatStateStore
+import com.kotlin.socket.chat.infrastructure.inmemory.store.RedisChatStateStore
 import com.kotlin.socket.chat.model.RoomId
 import com.kotlin.socket.common.lock.RedissonLockSupporter
 import io.kotest.core.spec.style.DescribeSpec

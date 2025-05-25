@@ -1,4 +1,4 @@
-package com.kotlin.socket.chat.infrastructure
+package com.kotlin.socket.chat.infrastructure.inmemory.store
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.kotlin.socket.chat.dto.ChatState

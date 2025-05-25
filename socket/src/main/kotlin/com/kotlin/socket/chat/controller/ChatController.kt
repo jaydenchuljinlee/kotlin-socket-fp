@@ -28,7 +28,7 @@ class ChatController(
     }
 
     @MessageMapping("/chat/message/{roomId}")
-    @SendTo("/topic/chatroom/{roomId}")
+    @SendTo("/topic/message/{roomId}")
     fun handleMessage(
         @DestinationVariable roomId: String,
         @Payload request: MessageRequest
@@ -56,4 +56,21 @@ class ChatController(
                 )
         }
     }
+
+    @MessageMapping("/chat/typing/{roomId}")
+    @SendTo("/topic/typing/{roomId}")
+    fun handleTyping(
+        @DestinationVariable roomId: String,
+        @Payload request: TypingRequest
+    ): TypingResponse {
+        val message = runBlocking {
+            chatService.executeCommand(ChatCommand.Typing(roomId, request.userId))
+                .fold(
+                    ifLeft = { error -> MessageResponse("[Error] ${error.toMessage()}") },
+                    ifRight = { response -> response }
+                )
+        }
+        return TypingResponse(request.userId)
+    }
+
 }

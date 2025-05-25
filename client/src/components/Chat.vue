@@ -146,6 +146,7 @@
                   placeholder="메시지를 입력하세요..."
                   class="flex-1 h-11 px-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 shadow-sm"
                   @keyup.enter="sendMessage"
+                  @input="handleTyping"
                 />
                 <button
                   @click="sendMessage"
@@ -166,6 +167,10 @@
               </div>
             </div>
           </div>
+        </div>
+
+        <div class="px-4 text-sm text-gray-500 italic" v-if="typingText">
+          {{ typingText }}
         </div>
 
         <!-- Disconnected State -->
@@ -192,7 +197,7 @@
 </template>
 
 <script setup>
-import { ref, nextTick, watch } from 'vue'
+import { ref, nextTick, watch, computed } from 'vue'
 // import SockJS from 'sockjs-client'
 import { Client } from '@stomp/stompjs'
 
@@ -204,6 +209,8 @@ const content = ref('')
 const messages = ref([])
 const connected = ref(false)
 const messageContainer = ref(null)
+const typingUsers = ref(new Set())
+const typingTimeout = ref(null)
 
 const scrollToBottom = async () => {
   await nextTick()
@@ -225,13 +232,30 @@ const connect = () => {
       stompClient.value.subscribe(`/topic/chatroom/${roomId.value}`, (message) => {
         try {
           const parsed = JSON.parse(message.body)
-          console.log(parsed)
-          messages.value.push(parsed)
+          if (parsed.from) {
+            messages.value.push(parsed)
+          }
         } catch {
           messages.value.push({ content: message.body })
-          console.log(messages.value)
+          console.error(`chatroom => ${messages.value}`)
         }
       })
+
+      // ✅ 메시지 구독
+      stompClient.value.subscribe(`/topic/message/${roomId.value}`, (message) => {
+        try {
+          const parsed = JSON.parse(message.body)
+          if (parsed.content) {
+            messages.value.push(parsed)
+          }
+        } catch {
+          messages.value.push({ content: message.body.content })
+          console.error(`message => ${messages.value}`)
+        }
+      })
+
+      // ✅ 타이핑 구독
+      stompClient.value.subscribe(`/topic/typing/${roomId.value}`, handleTypingMessage)
 
       stompClient.value.publish({
         destination: `/app/chat/join/${roomId.value}`,
@@ -271,6 +295,46 @@ const sendMessage = () => {
     }),
   })
   content.value = ''
+}
+
+const handleTyping = () => {
+  if (typingTimeout.value) clearTimeout(typingTimeout.value)
+
+  sendTyping()
+
+  typingTimeout.value = setTimeout(() => {
+    // 입력 멈춤 후 자동 제거 로직 등
+  }, 3000)
+}
+
+const sendTyping = () => {
+  if (!stompClient.value || !connected.value) return
+
+  stompClient.value.publish({
+    destination: `/app/chat/typing/${roomId.value}`,
+    body: JSON.stringify({ userId: Number(userId.value) }),
+  })
+}
+
+const typingText = computed(() => {
+  if (typingUsers.value.size === 0) return ''
+  const names = Array.from(typingUsers.value).map((id) => `User ${id}`)
+  return `${names.join(', ')} 입력 중...`
+})
+
+const handleTypingMessage = (message) => {
+  try {
+    const parsed = JSON.parse(message.body)
+    console.log(`✏️ User ${parsed.userId} is typing...`)
+    typingUsers.value.add(parsed.userId)
+
+    // 일정 시간 후 자동 제거 (클라이언트 측)
+    setTimeout(() => {
+      typingUsers.value.delete(parsed.userId)
+    }, 3000)
+  } catch (e) {
+    console.warn('타이핑 메시지 처리 에러', e)
+  }
 }
 
 const isMyMessage = (msg) => msg.from === Number(userId.value)

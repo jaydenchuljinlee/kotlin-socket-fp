@@ -11,11 +11,14 @@ import io.mockk.mockk
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
+import org.springframework.data.redis.core.StringRedisTemplate
 
 class ChatEffectExecutorTest : DescribeSpec({
     val mockBroadcastExecutor = mockk<BroadcastEffectExecutor>()
     val mockPersistMessageExecutor = mockk<PersistMessageEffectExecutor>()
-    val executor = ChatEffectExecutor(mockBroadcastExecutor, mockPersistMessageExecutor)
+    val mockUserStateEffectExecutor = mockk<UserStateEffectExecutor>()
+    val mockRedisTemplate = mockk<StringRedisTemplate>()
+    val executor = ChatEffectExecutor(mockBroadcastExecutor, mockPersistMessageExecutor, mockUserStateEffectExecutor, mockRedisTemplate)
 
     describe("ChatEffectExecutor") {
         describe("효과 실행") {
